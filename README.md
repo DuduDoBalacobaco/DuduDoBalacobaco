@@ -6,7 +6,7 @@
   <img src="./assets/ranni_background_4k.png" width="100%" alt="Ranni Banner">
 </p>
 
-<table>
+<table align="center">
   <tr>
     <td width="60%" valign="top">
 
