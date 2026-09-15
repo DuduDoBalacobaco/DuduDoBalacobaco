@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="./assets/moldura.svg" width="100%" alt="Ranni Banner">
+  <img src="./assets/ranni_background_4k.png" width="100%" alt="Ranni Banner">
 </p>
 
 <table align="center">
