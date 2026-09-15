@@ -1,1 +1,7 @@
-![Ranni Contribution Graph](generated/ranni-contributions.gif)
+Backend Developer | Java | Spring Boot
+
+![Ranni Contribution Graph](./generated/ranni-contributions.gif)
+
+Tecnologias
+
+Java • Spring Boot • PostgreSQL • Docker
