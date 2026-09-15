@@ -954,6 +954,47 @@ for frame_number in range(FRAMES):
 
 
 # ============================================================
+# CRIAR BANNER COM BACKGROUND
+# ============================================================
+
+background = Image.open(
+    "assets/ranni-background.png"
+).convert("RGBA")
+
+BANNER_WIDTH = background.width
+BANNER_HEIGHT = background.height
+
+banner_frames = []
+
+# posição inicial do gráfico no banner
+GRAPH_BANNER_X = 80
+GRAPH_BANNER_Y = 520
+
+for graph_frame in frames:
+
+    # copia o background para cada frame
+    banner = background.copy()
+
+    # volta o frame do gráfico para RGBA
+    graph_frame = graph_frame.convert("RGBA")
+
+    # coloca o gráfico por cima do background
+    banner.alpha_composite(
+        graph_frame,
+        (
+            GRAPH_BANNER_X,
+            GRAPH_BANNER_Y
+        )
+    )
+
+    banner_frames.append(
+        banner.convert(
+            "P",
+            palette=Image.Palette.ADAPTIVE
+        )
+    )
+
+# ============================================================
 # SALVAR GIF
 # ============================================================
 
@@ -978,4 +1019,23 @@ frames[0].save(
 
 print(
     f"Gráfico gerado: {output}"
+)
+
+# ============================================================
+# SALVAR BANNER COMPLETO
+# ============================================================
+
+banner_output = "generated/profile.gif"
+
+banner_frames[0].save(
+    banner_output,
+    save_all=True,
+    append_images=banner_frames[1:],
+    duration=FRAME_DURATION,
+    loop=0,
+    optimize=False
+)
+
+print(
+    f"Banner gerado: {banner_output}"
 )
