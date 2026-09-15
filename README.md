@@ -66,6 +66,31 @@ e explorar novas tecnologias.
 ### Currently Learning
  ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)
 
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+
+### 🌙 Pokédex
+
+Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
+
+**Stack:** JavaScript • HTML • CSS
+
+<a href="https://github.com/DuduDoBalacobaco/pokedex">
+  🔗 Ver Projeto
+</a>
+
+  </td>
+
+  <td>
+    <img src="./assets/mini_ranni_pokebola.jpg" width="300">
+  </td>
+
+  </tr>
+</table>
+
+
 <p align="center">
   <img src="./generated/ranni-contributions.gif" width="100%" alt="Ranni Contribution Graph">
 </p>
