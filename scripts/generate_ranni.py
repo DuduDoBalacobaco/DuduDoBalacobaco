@@ -218,8 +218,6 @@ ranni_y = (
 # ESCOLHER ALVOS
 # ============================================================
 
-random.seed(42)
-
 targets = [
     cell
     for cell in cells
