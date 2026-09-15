@@ -89,9 +89,10 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
 
   <tr>
     <td width="50%" valign="top" align="center">
+
   ### Crud de clientes
 
-  Um crud bem completo e bem arquiteturado.
+  Um crud bem completo e bem arquiteturado, com banco de dados.
 
   **Stack:** Node.js • Express • TypeScript
 
