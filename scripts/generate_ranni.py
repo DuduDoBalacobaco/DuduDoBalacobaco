@@ -958,7 +958,7 @@ for frame_number in range(FRAMES):
 # ============================================================
 
 background = Image.open(
-    "assets/ranni-background.png"
+    "assets/ranni_background_4k.png"
 ).convert("RGBA")
 
 BANNER_WIDTH = background.width
