@@ -96,5 +96,9 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
 
 
 <p align="center">
+  <img src="./assets/graph_github.svg" width="900" alt="Stellar Contributions">
+</p>
+
+<p align="center">
   <img src="./generated/ranni-contributions.gif" width="100%" alt="Ranni Contribution Graph">
 </p>
