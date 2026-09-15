@@ -87,6 +87,8 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
 
   </tr>
 
+  <tr>
+    <td width="50%" valign="top" align="center">
   ### Crud de clientes
 
   Um crud bem completo e bem arquiteturado.
@@ -100,10 +102,8 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
   </td>
 
   <td align="center">
-    <img src="./assets/ranni_rh.png" width="200">
+    <img src="./assets/ranni_v4_rh.png" width="200">
   </td>
-
-  <tr>
 
   </tr>
 
