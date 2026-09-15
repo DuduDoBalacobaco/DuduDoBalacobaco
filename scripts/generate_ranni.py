@@ -1,7 +1,9 @@
 import os
 import random
 import requests
+
 from PIL import Image, ImageDraw, ImageFilter
+
 
 TOKEN = os.environ["GH_TOKEN"]
 USERNAME = os.environ["GITHUB_USERNAME"]
@@ -61,10 +63,19 @@ GAP = 3
 GRAPH_WIDTH = len(weeks) * (CELL_SIZE + GAP)
 GRAPH_HEIGHT = 7 * (CELL_SIZE + GAP)
 
-FRAMES = 40
-FRAME_DURATION = 80
+# Mais frames + maior duração = animação mais lenta
+FRAMES = 120
+FRAME_DURATION = 100
 
+# Fundo
+BACKGROUND = (24, 28, 34, 255)
+
+# Quadrados normais
+GRAY = (75, 82, 92, 255)
+
+# Quadrados atingidos pelas estrelas
 BLUE = (80, 180, 255, 255)
+
 STAR_COLOR = (180, 230, 255, 255)
 
 
@@ -74,33 +85,36 @@ STAR_COLOR = (180, 230, 255, 255)
 
 ranni = Image.open("assets/ranni.gif").convert("RGBA")
 
-# A imagem possui bastante espaço preto ao redor da Ranni.
-# Recortamos apenas a região onde ela está.
+# Recorta apenas a região onde está a Ranni
 ranni = ranni.crop((320, 490, 490, 811))
 
 # Redimensiona para caber no gráfico
 ranni.thumbnail((100, 100), Image.Resampling.LANCZOS)
 
 
-# Remove o fundo preto
+# ============================================================
+# REMOVER FUNDO PRETO
+# ============================================================
+
 pixels = ranni.load()
 
 for y in range(ranni.height):
     for x in range(ranni.width):
+
         r, g, b, a = pixels[x, y]
 
-        # Preto vira transparente
         if r < 30 and g < 30 and b < 30:
             pixels[x, y] = (0, 0, 0, 0)
 
 
 # ============================================================
-# PEGAR CÉLULAS COM CONTRIBUIÇÕES
+# PEGAR CÉLULAS
 # ============================================================
 
 cells = []
 
 for x, week in enumerate(weeks):
+
     for y, day in enumerate(week["contributionDays"]):
 
         px = x * (CELL_SIZE + GAP)
@@ -123,7 +137,7 @@ ranni_y = (GRAPH_HEIGHT - ranni.height) // 2
 
 
 # ============================================================
-# ESTRELAS
+# ESCOLHER ALVOS
 # ============================================================
 
 random.seed(42)
@@ -134,31 +148,33 @@ targets = [
     if cell["count"] > 0
 ]
 
-# Escolhemos alguns quadrados reais para serem atingidos
 random.shuffle(targets)
+
 targets = targets[:12]
 
 
 # ============================================================
-# FUNÇÃO PARA DESENHAR O GRÁFICO
+# DESENHAR GRÁFICO
 # ============================================================
 
 def draw_graph(activated):
+
     image = Image.new(
         "RGBA",
         (GRAPH_WIDTH, GRAPH_HEIGHT),
-        (255, 255, 255, 255),
+        BACKGROUND,
     )
 
     draw = ImageDraw.Draw(image)
 
-    # Quadrados
     for cell in cells:
 
-        color = cell["color"]
+        # Todos os quadrados começam cinza
+        color = GRAY
 
+        # Quadrado atingido pela estrela fica azul
         if cell in activated:
-            color = "#4db8ff"
+            color = BLUE
 
         x = cell["x"]
         y = cell["y"]
@@ -185,27 +201,30 @@ frames = []
 
 for frame_number in range(FRAMES):
 
+    # Cada estrela ativa um quadrado progressivamente
     activated_count = min(
         len(targets),
-        frame_number // 3
+        frame_number // 10
     )
 
     activated = targets[:activated_count]
 
     image = draw_graph(activated)
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # RANNI
-    # --------------------------------------------------------
+    # ========================================================
 
     image.alpha_composite(
         ranni,
         (ranni_x, ranni_y),
     )
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # ESTRELAS
-    # --------------------------------------------------------
+    # ========================================================
 
     draw = ImageDraw.Draw(image)
 
@@ -217,7 +236,8 @@ for frame_number in range(FRAMES):
         target_x = target["x"] + CELL_SIZE // 2
         target_y = target["y"] + CELL_SIZE // 2
 
-        progress = (frame_number - i * 3) / 8
+        # Movimento mais lento
+        progress = (frame_number - i * 10) / 20
 
         if 0 <= progress <= 1:
 
@@ -231,7 +251,11 @@ for frame_number in range(FRAMES):
                 (target_y - start_y) * progress
             )
 
-            # brilho
+
+            # =================================================
+            # BRILHO
+            # =================================================
+
             glow = Image.new(
                 "RGBA",
                 image.size,
@@ -256,9 +280,13 @@ for frame_number in range(FRAMES):
 
             image.alpha_composite(glow)
 
+
+            # =================================================
+            # ESTRELA
+            # =================================================
+
             draw = ImageDraw.Draw(image)
 
-            # estrela
             draw.line(
                 [(x - 4, y), (x + 4, y)],
                 fill=STAR_COLOR,
