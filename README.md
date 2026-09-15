@@ -4,4 +4,4 @@ Backend Developer | Java | Spring Boot
 
 Tecnologias
 
-Java • Spring Boot • PostgreSQL • Docker
+Java • Spring Boot • PostgreSQL • JavaScript/TypeScript • Node.js
