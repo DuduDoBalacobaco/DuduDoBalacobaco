@@ -9,3 +9,4 @@ Backend Developer | Java | Spring Boot
 Tecnologias
 
 Java • Spring Boot • PostgreSQL • JavaScript/TypeScript • Node.js
+![Profile](./generated/profile.gif)
