@@ -43,4 +43,3 @@ e explorar novas tecnologias.
 Tecnologias
 
 Java • Spring Boot • PostgreSQL • JavaScript/TypeScript • Node.js
-![Profile](./generated/profile.gif)
