@@ -69,7 +69,7 @@ GAP = 3
 GRAPH_WIDTH = len(weeks) * (CELL_SIZE + GAP)
 GRAPH_HEIGHT = 7 * (CELL_SIZE + GAP)
 
-# Animação mais lenta
+# Animação
 FRAMES = 120
 FRAME_DURATION = 100
 
@@ -99,7 +99,6 @@ def green_to_blue(color):
     g = int(color[2:4], 16)
     b = int(color[4:6], 16)
 
-    # Intensidade baseada principalmente no verde
     intensity = g / 255
 
     blue = int(110 + intensity * 145)
@@ -155,7 +154,7 @@ ranni.thumbnail(
 
 
 # ============================================================
-# REMOVER FUNDO PRETO
+# REMOVER FUNDO PRETO DA RANNI
 # ============================================================
 
 pixels = ranni.load()
@@ -174,6 +173,90 @@ for y in range(ranni.height):
                 0,
                 0,
             )
+
+
+# ============================================================
+# CARREGAR ESPADA
+# ============================================================
+
+sword = Image.open(
+    "assets/moonlight.jpg"
+).convert("RGBA")
+
+
+# ============================================================
+# REMOVER FUNDO PRETO DA ESPADA
+# ============================================================
+
+pixels = sword.load()
+
+for y in range(sword.height):
+
+    for x in range(sword.width):
+
+        r, g, b, a = pixels[x, y]
+
+        # Detecta o fundo preto
+        if r < 30 and g < 30 and b < 30:
+
+            pixels[x, y] = (
+                0,
+                0,
+                0,
+                0,
+            )
+
+
+# ============================================================
+# CORTAR ESPAÇOS VAZIOS DA ESPADA
+# ============================================================
+
+bbox = sword.getbbox()
+
+if bbox:
+    sword = sword.crop(bbox)
+
+
+# ============================================================
+# GIRAR ESPADA PARA HORIZONTAL
+# ============================================================
+
+sword = sword.rotate(
+    90,
+    expand=True
+)
+
+
+# ============================================================
+# REDIMENSIONAR ESPADA
+# ============================================================
+
+# Mantém uma margem nas laterais
+SWORD_WIDTH = GRAPH_WIDTH - 30
+
+sword.thumbnail(
+    (SWORD_WIDTH, 150),
+    Image.Resampling.LANCZOS
+)
+
+
+# ============================================================
+# ESPAÇO RESERVADO PARA A ESPADA
+# ============================================================
+
+SWORD_MARGIN_TOP = 8
+SWORD_MARGIN_BOTTOM = 8
+
+SWORD_SPACE = (
+    sword.height
+    + SWORD_MARGIN_TOP
+    + SWORD_MARGIN_BOTTOM
+)
+
+TOTAL_HEIGHT = (
+    GRAPH_HEIGHT
+    + SWORD_SPACE
+)
 
 
 # ============================================================
@@ -215,17 +298,24 @@ ranni_y = (
 
 
 # ============================================================
-# ESCOLHER ALVOS
+# ESCOLHER ALVOS ALEATÓRIOS
 # ============================================================
 
+# Somente quadrados que possuem contribuição
 targets = [
     cell
     for cell in cells
     if cell["count"] > 0
 ]
 
+
+# Embaralha completamente
 random.shuffle(targets)
 
+
+# Pega no máximo 12
+# Como a lista foi embaralhada e cada célula
+# existe apenas uma vez, não haverá repetição.
 targets = targets[:12]
 
 
@@ -239,12 +329,17 @@ def draw_graph(activated):
         "RGBA",
         (
             GRAPH_WIDTH,
-            GRAPH_HEIGHT,
+            TOTAL_HEIGHT,
         ),
         BACKGROUND,
     )
 
     draw = ImageDraw.Draw(image)
+
+
+    # ========================================================
+    # QUADRADOS
+    # ========================================================
 
     for cell in cells:
 
@@ -279,7 +374,7 @@ def draw_graph(activated):
 
 
         # ----------------------------------------------------
-        # DESENHAR
+        # DESENHAR QUADRADO
         # ----------------------------------------------------
 
         x = cell["x"]
@@ -296,6 +391,7 @@ def draw_graph(activated):
             fill=color,
         )
 
+
     return image
 
 
@@ -308,6 +404,11 @@ frames = []
 
 for frame_number in range(FRAMES):
 
+
+    # ========================================================
+    # QUADRADOS ATIVADOS
+    # ========================================================
+
     # A cada 10 frames uma estrela chega
     activated_count = min(
         len(targets),
@@ -319,18 +420,18 @@ for frame_number in range(FRAMES):
     ]
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # GRÁFICO
-    # --------------------------------------------------------
+    # ========================================================
 
     image = draw_graph(
         activated
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # RANNI
-    # --------------------------------------------------------
+    # ========================================================
 
     image.alpha_composite(
         ranni,
@@ -341,15 +442,20 @@ for frame_number in range(FRAMES):
     )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # ESTRELAS
-    # --------------------------------------------------------
+    # ========================================================
 
     draw = ImageDraw.Draw(image)
 
+
     for i, target in enumerate(targets):
 
-        # Origem = centro da Ranni
+
+        # ----------------------------------------------------
+        # ORIGEM = CENTRO DA RANNI
+        # ----------------------------------------------------
+
         start_x = (
             ranni_x
             + ranni.width // 2
@@ -361,7 +467,10 @@ for frame_number in range(FRAMES):
         )
 
 
-        # Destino = centro do quadrado
+        # ----------------------------------------------------
+        # DESTINO = CENTRO DO QUADRADO
+        # ----------------------------------------------------
+
         target_x = (
             target["x"]
             + CELL_SIZE // 2
@@ -373,7 +482,10 @@ for frame_number in range(FRAMES):
         )
 
 
-        # Movimento mais lento
+        # ----------------------------------------------------
+        # MOVIMENTO DA ESTRELA
+        # ----------------------------------------------------
+
         progress = (
             frame_number - i * 10
         ) / 20
@@ -381,17 +493,20 @@ for frame_number in range(FRAMES):
 
         if 0 <= progress <= 1:
 
+
             x = int(
                 start_x
                 + (
-                    target_x - start_x
+                    target_x
+                    - start_x
                 ) * progress
             )
 
             y = int(
                 start_y
                 + (
-                    target_y - start_y
+                    target_y
+                    - start_y
                 ) * progress
             )
 
@@ -411,9 +526,11 @@ for frame_number in range(FRAMES):
                 ),
             )
 
+
             glow_draw = ImageDraw.Draw(
                 glow
             )
+
 
             glow_draw.ellipse(
                 [
@@ -430,11 +547,13 @@ for frame_number in range(FRAMES):
                 ),
             )
 
+
             glow = glow.filter(
                 ImageFilter.GaussianBlur(
                     5
                 )
             )
+
 
             image.alpha_composite(
                 glow
@@ -445,9 +564,8 @@ for frame_number in range(FRAMES):
             # ESTRELA
             # =================================================
 
-            draw = ImageDraw.Draw(
-                image
-            )
+            draw = ImageDraw.Draw(image)
+
 
             draw.line(
                 [
@@ -457,6 +575,7 @@ for frame_number in range(FRAMES):
                 fill=STAR_COLOR,
                 width=2,
             )
+
 
             draw.line(
                 [
@@ -468,9 +587,85 @@ for frame_number in range(FRAMES):
             )
 
 
-    # --------------------------------------------------------
+    # ========================================================
+    # ESPADA / MOLDURA
+    # ========================================================
+
+    sword_x = (
+        GRAPH_WIDTH - sword.width
+    ) // 2
+
+    sword_y = (
+        GRAPH_HEIGHT
+        + SWORD_MARGIN_TOP
+    )
+
+
+    # ========================================================
+    # GLOW DA ESPADA
+    # ========================================================
+
+    sword_glow = Image.new(
+        "RGBA",
+        image.size,
+        (
+            0,
+            0,
+            0,
+            0,
+        ),
+    )
+
+
+    sword_glow_x = sword_x
+    sword_glow_y = sword_y
+
+
+    sword_glow.alpha_composite(
+        sword,
+        (
+            sword_glow_x,
+            sword_glow_y,
+        ),
+    )
+
+
+    sword_glow = sword_glow.filter(
+        ImageFilter.GaussianBlur(4)
+    )
+
+
+    # Deixa o glow mais discreto
+    alpha = sword_glow.getchannel("A")
+
+    alpha = alpha.point(
+        lambda value: int(value * 0.25)
+    )
+
+    sword_glow.putalpha(alpha)
+
+
+    image.alpha_composite(
+        sword_glow
+    )
+
+
+    # ========================================================
+    # ESPADA ORIGINAL
+    # ========================================================
+
+    image.alpha_composite(
+        sword,
+        (
+            sword_x,
+            sword_y,
+        ),
+    )
+
+
+    # ========================================================
     # SALVAR FRAME
-    # --------------------------------------------------------
+    # ========================================================
 
     frames.append(
         image.convert("P")
@@ -486,10 +681,12 @@ os.makedirs(
     exist_ok=True,
 )
 
+
 output = (
     "generated/"
     "ranni-contributions.gif"
 )
+
 
 frames[0].save(
     output,
@@ -499,6 +696,7 @@ frames[0].save(
     loop=0,
     optimize=False,
 )
+
 
 print(
     f"Gráfico gerado: {output}"
