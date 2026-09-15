@@ -69,7 +69,7 @@ Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fize
   <tr>
     <td width="50%" valign="top" align="center">
 
-### 🌙 Pokédex
+### Pokédex
 
 Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
 
@@ -86,6 +86,27 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
   </td>
 
   </tr>
+
+  ### Crud de clientes
+
+  Um crud bem completo e bem arquiteturado.
+
+  **Stack:** Node.js • Express • TypeScript
+
+  <a href="https://github.com/DuduDoBalacobaco/Crud_de_clientes_com_node-express-typescript">
+    🔗 Ver Projeto
+  </a>
+
+  </td>
+
+  <td align="center">
+    <img src="./assets/ranni_rh.png" width="200">
+  </td>
+
+  <tr>
+
+  </tr>
+
 </table>
 
 
