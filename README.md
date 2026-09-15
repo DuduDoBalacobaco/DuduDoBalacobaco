@@ -1,10 +1,14 @@
 <p align="center">
+  <img src="./assets/profile-title.svg" width="900" alt="DuduDoBalacobaco - Backend Developer">
+</p>
+
+<p align="center">
   <img src="./assets/ranni_background_4k.png" width="100%" alt="Ranni Banner">
 </p>
 
-Backend Developer | Java | Spring Boot
-
-![Ranni Contribution Graph](./generated/ranni-contributions.gif)
+<p align="center">
+  <img src="./generated/ranni-contributions.gif" width="100%" alt="Ranni Contribution Graph">
+</p>
 
 Tecnologias
 

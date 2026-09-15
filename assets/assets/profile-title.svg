@@ -1,0 +1,39 @@
+<svg width="900" height="130" viewBox="0 0 900 130"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <filter id="blueGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Nome -->
+  <text
+    x="450"
+    y="52"
+    text-anchor="middle"
+    font-family="Segoe UI, Arial, sans-serif"
+    font-size="38"
+    font-weight="700"
+    fill="#9DDCFF"
+    filter="url(#blueGlow)">
+    DuduDoBalacobaco
+  </text>
+
+  <!-- Cargo / Stack -->
+  <text
+    x="450"
+    y="100"
+    text-anchor="middle"
+    font-family="Segoe UI, Arial, sans-serif"
+    font-size="22"
+    font-weight="500"
+    fill="#70B7E6">
+    Backend Developer | Java | Spring Boot
+  </text>
+
+</svg>
