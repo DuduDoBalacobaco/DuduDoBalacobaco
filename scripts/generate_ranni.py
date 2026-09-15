@@ -1,6 +1,7 @@
 import os
+import random
 import requests
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 TOKEN = os.environ["GH_TOKEN"]
 USERNAME = os.environ["GITHUB_USERNAME"]
@@ -45,45 +46,250 @@ data = response.json()
 if "errors" in data:
     raise RuntimeError(data["errors"])
 
-weeks = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
+weeks = data["data"]["user"]["contributionsCollection"][
+    "contributionCalendar"
+]["weeks"]
 
-# Configurações do gráfico
+
+# ============================================================
+# CONFIGURAÇÕES
+# ============================================================
+
 CELL_SIZE = 12
 GAP = 3
 
-WIDTH = len(weeks) * (CELL_SIZE + GAP)
-HEIGHT = 7 * (CELL_SIZE + GAP)
+GRAPH_WIDTH = len(weeks) * (CELL_SIZE + GAP)
+GRAPH_HEIGHT = 7 * (CELL_SIZE + GAP)
 
-image = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-draw = ImageDraw.Draw(image)
+FRAMES = 40
+FRAME_DURATION = 80
+
+BLUE = (80, 180, 255, 255)
+STAR_COLOR = (180, 230, 255, 255)
+
+
+# ============================================================
+# CARREGAR RANNI
+# ============================================================
+
+ranni = Image.open("assets/ranni.gif").convert("RGBA")
+
+# A imagem possui bastante espaço preto ao redor da Ranni.
+# Recortamos apenas a região onde ela está.
+ranni = ranni.crop((320, 490, 490, 811))
+
+# Redimensiona para caber no gráfico
+ranni.thumbnail((100, 100), Image.Resampling.LANCZOS)
+
+
+# Remove o fundo preto
+pixels = ranni.load()
+
+for y in range(ranni.height):
+    for x in range(ranni.width):
+        r, g, b, a = pixels[x, y]
+
+        # Preto vira transparente
+        if r < 30 and g < 30 and b < 30:
+            pixels[x, y] = (0, 0, 0, 0)
+
+
+# ============================================================
+# PEGAR CÉLULAS COM CONTRIBUIÇÕES
+# ============================================================
+
+cells = []
 
 for x, week in enumerate(weeks):
     for y, day in enumerate(week["contributionDays"]):
-        color = day["color"]
 
         px = x * (CELL_SIZE + GAP)
         py = y * (CELL_SIZE + GAP)
 
+        cells.append({
+            "x": px,
+            "y": py,
+            "color": day["color"],
+            "count": day["contributionCount"],
+        })
+
+
+# ============================================================
+# POSIÇÃO DA RANNI
+# ============================================================
+
+ranni_x = (GRAPH_WIDTH - ranni.width) // 2
+ranni_y = (GRAPH_HEIGHT - ranni.height) // 2
+
+
+# ============================================================
+# ESTRELAS
+# ============================================================
+
+random.seed(42)
+
+targets = [
+    cell
+    for cell in cells
+    if cell["count"] > 0
+]
+
+# Escolhemos alguns quadrados reais para serem atingidos
+random.shuffle(targets)
+targets = targets[:12]
+
+
+# ============================================================
+# FUNÇÃO PARA DESENHAR O GRÁFICO
+# ============================================================
+
+def draw_graph(activated):
+    image = Image.new(
+        "RGBA",
+        (GRAPH_WIDTH, GRAPH_HEIGHT),
+        (255, 255, 255, 255),
+    )
+
+    draw = ImageDraw.Draw(image)
+
+    # Quadrados
+    for cell in cells:
+
+        color = cell["color"]
+
+        if cell in activated:
+            color = "#4db8ff"
+
+        x = cell["x"]
+        y = cell["y"]
+
         draw.rounded_rectangle(
             [
-                px,
-                py,
-                px + CELL_SIZE,
-                py + CELL_SIZE,
+                x,
+                y,
+                x + CELL_SIZE,
+                y + CELL_SIZE,
             ],
             radius=2,
             fill=color,
         )
 
-output = "generated/ranni-contributions.gif"
+    return image
+
+
+# ============================================================
+# ANIMAÇÃO
+# ============================================================
+
+frames = []
+
+for frame_number in range(FRAMES):
+
+    activated_count = min(
+        len(targets),
+        frame_number // 3
+    )
+
+    activated = targets[:activated_count]
+
+    image = draw_graph(activated)
+
+    # --------------------------------------------------------
+    # RANNI
+    # --------------------------------------------------------
+
+    image.alpha_composite(
+        ranni,
+        (ranni_x, ranni_y),
+    )
+
+    # --------------------------------------------------------
+    # ESTRELAS
+    # --------------------------------------------------------
+
+    draw = ImageDraw.Draw(image)
+
+    for i, target in enumerate(targets):
+
+        start_x = ranni_x + ranni.width // 2
+        start_y = ranni_y + ranni.height // 2
+
+        target_x = target["x"] + CELL_SIZE // 2
+        target_y = target["y"] + CELL_SIZE // 2
+
+        progress = (frame_number - i * 3) / 8
+
+        if 0 <= progress <= 1:
+
+            x = int(
+                start_x +
+                (target_x - start_x) * progress
+            )
+
+            y = int(
+                start_y +
+                (target_y - start_y) * progress
+            )
+
+            # brilho
+            glow = Image.new(
+                "RGBA",
+                image.size,
+                (0, 0, 0, 0),
+            )
+
+            glow_draw = ImageDraw.Draw(glow)
+
+            glow_draw.ellipse(
+                [
+                    x - 8,
+                    y - 8,
+                    x + 8,
+                    y + 8,
+                ],
+                fill=(100, 200, 255, 100),
+            )
+
+            glow = glow.filter(
+                ImageFilter.GaussianBlur(5)
+            )
+
+            image.alpha_composite(glow)
+
+            draw = ImageDraw.Draw(image)
+
+            # estrela
+            draw.line(
+                [(x - 4, y), (x + 4, y)],
+                fill=STAR_COLOR,
+                width=2,
+            )
+
+            draw.line(
+                [(x, y - 4), (x, y + 4)],
+                fill=STAR_COLOR,
+                width=2,
+            )
+
+
+    frames.append(image.convert("P"))
+
+
+# ============================================================
+# SALVAR GIF
+# ============================================================
 
 os.makedirs("generated", exist_ok=True)
 
-image.convert("P", palette=Image.ADAPTIVE).save(
+output = "generated/ranni-contributions.gif"
+
+frames[0].save(
     output,
     save_all=True,
-    duration=100,
+    append_images=frames[1:],
+    duration=FRAME_DURATION,
     loop=0,
+    optimize=False,
 )
 
-print(f"Gráfico gerado em: {output}")
+print(f"Gráfico gerado: {output}")
