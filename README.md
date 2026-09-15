@@ -30,7 +30,7 @@ e explorar novas tecnologias.
 
   <td width="40%" align="center">
 
-<img src="./assets/ranni_cafe.jpg" width="300">
+<img src="./assets/ranni_cafe.JPG" width="300">
 
   </td>
   </tr>
