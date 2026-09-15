@@ -22,11 +22,11 @@
   <!-- Ornamento esquerdo -->
   <path
     d="M60 45
-       H175
-       L200 30
-       L215 45
-       L200 60
-       L175 45"
+       H155
+       L180 30
+       L195 45
+       L180 60
+       L155 45"
     fill="none"
     stroke="url(#ice)"
     stroke-width="2"
@@ -53,11 +53,11 @@
   <!-- Ornamento direito -->
   <path
     d="M840 45
-       H725
-       L700 30
-       L685 45
-       L700 60
-       L725 45"
+       H745
+       L720 30
+       L705 45
+       L720 60
+       L745 45"
     fill="none"
     stroke="url(#ice)"
     stroke-width="2"
