@@ -6,29 +6,35 @@
   <img src="./assets/ranni_background_4k.png" width="100%" alt="Ranni Banner">
 </p>
 
-<div align="center">
+<table align="center">
+  <tr>
+    <td width="60%" valign="top" style="border: none;">
 
-<img
-  align="right"
-  width="300"
-  src="./assets/ranni_cafe.png"
-/>
-
-### About Me
+### 🌙 About Me
 
 Backend Developer focado em **Java e Spring Boot**.
 
-- ☕ Java
-- 🍃 Spring Boot
-- 🐘 PostgreSQL
-- 🐳 Docker
-- 📨 Kafka
+Atualmente estudando e desenvolvendo projetos com:
 
-Estudando arquitetura, microsserviços e desenvolvimento backend.
+- Java
+- Spring Boot
+- PostgreSQL
+- Docker
+- Kafka
+- JavaScript / TypeScript
 
-<br clear="right"/>
+Gosto de construir APIs, estudar arquitetura de software
+e explorar novas tecnologias.
 
-</div>
+  </td>
+
+  <td width="40%" align="center" style="border: none;">
+
+<img src="./assets/ranni_cafe.png" width="300">
+
+  </td>
+  </tr>
+</table>
 
 <p align="center">
   <img src="./generated/ranni-contributions.gif" width="100%" alt="Ranni Contribution Graph">
