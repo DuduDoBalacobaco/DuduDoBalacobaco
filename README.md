@@ -67,6 +67,10 @@ e explorar novas tecnologias.
  ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)
 
 
+<p align="center">
+  <img src="./assets/projects.svg" width="900" alt="Developer Grimoire">
+</p>
+
 <table align="center">
   <tr>
     <td width="50%" valign="top" align="center">
