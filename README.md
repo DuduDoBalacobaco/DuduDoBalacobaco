@@ -39,7 +39,9 @@ Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fize
   <img src="./assets/tech_arsenal.svg" width="900" alt="Tech Arsenal">
 </p>
 
-<h3 align="center">Languages</h3>
+<p align="center">
+  <img src="./assets/languages.svg" width="500" alt="Languages">
+</p>
 
 <div align="center">
   
@@ -49,7 +51,9 @@ Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fize
   
 </div>
 
-<h3 align="center">Backend</h3>
+<p align="center">
+  <img src="./assets/backend.svg" width="500" alt="Backend">
+</p>
 
 <div align="center">
   
@@ -59,7 +63,9 @@ Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fize
   
 </div>
 
-<h3 align="center">Frontend</h3>
+<p align="center">
+  <img src="./assets/frontend.svg" width="500" alt="Frontend">
+</p>
 
 <div align="center">
 
@@ -68,7 +74,9 @@ Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fize
   
 </div>
 
-<h3 align="center">Tools</h3>
+<p align="center">
+  <img src="./assets/tools.svg" width="500" alt="Tools">
+</p>
 
 <div align="center">
 
