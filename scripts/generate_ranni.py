@@ -88,10 +88,10 @@ STAR_COLOR = (180, 230, 255, 255)
 # ============================================================
 
 # Espessura da moldura
-FRAME_SIZE = 14
+FRAME_SIZE = 18
 
 # Espaço entre o gráfico e a moldura
-FRAME_PADDING = 5
+FRAME_PADDING = 7
 
 # Tamanho final da imagem
 TOTAL_WIDTH = (
@@ -952,48 +952,6 @@ for frame_number in range(FRAMES):
         image.convert("P")
     )
 
-
-# ============================================================
-# CRIAR BANNER COM BACKGROUND
-# ============================================================
-
-background = Image.open(
-    "assets/ranni_background_4k.png"
-).convert("RGBA")
-
-BANNER_WIDTH = background.width
-BANNER_HEIGHT = background.height
-
-banner_frames = []
-
-# posição inicial do gráfico no banner
-GRAPH_BANNER_X = 80
-GRAPH_BANNER_Y = 520
-
-for graph_frame in frames:
-
-    # copia o background para cada frame
-    banner = background.copy()
-
-    # volta o frame do gráfico para RGBA
-    graph_frame = graph_frame.convert("RGBA")
-
-    # coloca o gráfico por cima do background
-    banner.alpha_composite(
-        graph_frame,
-        (
-            GRAPH_BANNER_X,
-            GRAPH_BANNER_Y
-        )
-    )
-
-    banner_frames.append(
-        banner.convert(
-            "P",
-            palette=Image.Palette.ADAPTIVE
-        )
-    )
-
 # ============================================================
 # SALVAR GIF
 # ============================================================
@@ -1019,23 +977,4 @@ frames[0].save(
 
 print(
     f"Gráfico gerado: {output}"
-)
-
-# ============================================================
-# SALVAR BANNER COMPLETO
-# ============================================================
-
-banner_output = "generated/profile.gif"
-
-banner_frames[0].save(
-    banner_output,
-    save_all=True,
-    append_images=banner_frames[1:],
-    duration=FRAME_DURATION,
-    loop=0,
-    optimize=False
-)
-
-print(
-    f"Banner gerado: {banner_output}"
 )
