@@ -8,7 +8,7 @@
 
 <table align="center">
   <tr>
-    <td width="60%" valign="top" style="border: none;">
+    <td width="60%" valign="top">
 
 ### 🌙 About Me
 
@@ -28,7 +28,7 @@ e explorar novas tecnologias.
 
   </td>
 
-  <td width="40%" align="center" style="border: none;">
+  <td width="40%" align="center">
 
 <img src="./assets/ranni_cafe.png" width="300">
 
