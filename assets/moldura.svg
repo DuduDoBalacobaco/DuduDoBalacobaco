@@ -1,0 +1,329 @@
+<svg
+  width="900"
+  height="300"
+  viewBox="0 0 900 300"
+  xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+
+    <!-- ============================================= -->
+    <!-- GRADIENTE DA BORDA -->
+    <!-- ============================================= -->
+
+    <linearGradient id="borderGradient" x1="0" x2="1">
+      <stop offset="0%" stop-color="#355f88"/>
+      <stop offset="25%" stop-color="#7ddcff"/>
+      <stop offset="50%" stop-color="#d2f4ff"/>
+      <stop offset="75%" stop-color="#7ddcff"/>
+      <stop offset="100%" stop-color="#355f88"/>
+    </linearGradient>
+
+
+    <!-- ============================================= -->
+    <!-- GLOW -->
+    <!-- ============================================= -->
+
+    <filter id="glow"
+            x="-30%"
+            y="-30%"
+            width="160%"
+            height="160%">
+
+      <feGaussianBlur
+        stdDeviation="5"
+        result="blur"/>
+
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+
+    </filter>
+
+
+    <!-- ============================================= -->
+    <!-- FUMAÇA GELADA -->
+    <!-- ============================================= -->
+
+    <filter id="frostSmoke"
+            x="-50%"
+            y="-100%"
+            width="200%"
+            height="300%">
+
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.012 0.045"
+        numOctaves="3"
+        seed="8"
+        result="noise">
+
+        <!-- Movimento da fumaça -->
+        <animate
+          attributeName="baseFrequency"
+          values="
+            0.012 0.045;
+            0.018 0.030;
+            0.010 0.050;
+            0.012 0.045
+          "
+          dur="8s"
+          repeatCount="indefinite"/>
+
+      </feTurbulence>
+
+
+      <!-- Distorção -->
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="noise"
+        scale="45"
+        xChannelSelector="R"
+        yChannelSelector="B"
+        result="distorted"/>
+
+
+      <!-- Blur -->
+      <feGaussianBlur
+        in="distorted"
+        stdDeviation="11"
+        result="smoke"/>
+
+
+      <!-- Cor azul -->
+      <feColorMatrix
+        in="smoke"
+        type="matrix"
+        values="
+          0 0 0 0 0.30
+          0 0 0 0 0.72
+          0 0 0 0 1
+          0 0 0 0.65 0
+        "/>
+
+    </filter>
+
+
+    <!-- ============================================= -->
+    <!-- GLOW DAS PARTÍCULAS -->
+    <!-- ============================================= -->
+
+    <filter id="particleGlow"
+            x="-300%"
+            y="-300%"
+            width="600%"
+            height="600%">
+
+      <feGaussianBlur
+        stdDeviation="2"
+        result="blur"/>
+
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+
+    </filter>
+
+  </defs>
+
+
+<!-- ============================================= -->
+<!-- IMAGEM -->
+<!-- ============================================= -->
+
+<image
+  href="ranni_background_4k.png"
+  x="25"
+  y="25"
+  width="850"
+  height="250"
+  preserveAspectRatio="xMidYMid slice"
+/>
+
+
+  <!-- ============================================= -->
+  <!-- FUMAÇA SUPERIOR -->
+  <!-- ============================================= -->
+
+  <g filter="url(#frostSmoke)"
+     opacity="0.65">
+
+    <path
+      d="
+        M40 40
+        C130 0 190 65 280 30
+        C370 0 420 55 510 25
+        C600 0 690 60 860 30
+      "
+      fill="none"
+      stroke="#7ddcff"
+      stroke-width="25">
+
+      <animateTransform
+        attributeName="transform"
+        type="translate"
+        values="
+          -15 0;
+          15 -8;
+          -15 0
+        "
+        dur="7s"
+        repeatCount="indefinite"/>
+
+    </path>
+
+  </g>
+
+
+  <!-- ============================================= -->
+  <!-- FUMAÇA INFERIOR -->
+  <!-- ============================================= -->
+
+  <g filter="url(#frostSmoke)"
+     opacity="0.55">
+
+    <path
+      d="
+        M40 265
+        C150 225 230 290 340 255
+        C450 220 550 290 650 250
+        C730 220 790 275 860 255
+      "
+      fill="none"
+      stroke="#59c8ff"
+      stroke-width="22">
+
+      <animateTransform
+        attributeName="transform"
+        type="translate"
+        values="
+          15 0;
+          -15 7;
+          15 0
+        "
+        dur="9s"
+        repeatCount="indefinite"/>
+
+    </path>
+
+  </g>
+
+
+  <!-- ============================================= -->
+  <!-- BORDA -->
+  <!-- ============================================= -->
+
+  <rect
+    x="25"
+    y="25"
+    width="850"
+    height="250"
+    rx="16"
+    fill="none"
+    stroke="url(#borderGradient)"
+    stroke-width="3"
+    filter="url(#glow)"/>
+
+
+  <!-- Segunda linha interna -->
+
+  <rect
+    x="32"
+    y="32"
+    width="836"
+    height="236"
+    rx="12"
+    fill="none"
+    stroke="#579ac2"
+    stroke-width="1"
+    opacity="0.5"/>
+
+
+  <!-- ============================================= -->
+  <!-- PARTÍCULAS DE GELO -->
+  <!-- ============================================= -->
+
+  <g
+    fill="#d5f5ff"
+    filter="url(#particleGlow)">
+
+    <circle r="2">
+      <animate
+        attributeName="cx"
+        values="100;170;240"
+        dur="5s"
+        repeatCount="indefinite"/>
+
+      <animate
+        attributeName="cy"
+        values="42;22;35"
+        dur="5s"
+        repeatCount="indefinite"/>
+
+      <animate
+        attributeName="opacity"
+        values="0;1;0"
+        dur="5s"
+        repeatCount="indefinite"/>
+    </circle>
+
+
+    <circle r="1.5">
+      <animate
+        attributeName="cx"
+        values="690;750;820"
+        dur="6s"
+        repeatCount="indefinite"/>
+
+      <animate
+        attributeName="cy"
+        values="260;235;255"
+        dur="6s"
+        repeatCount="indefinite"/>
+
+      <animate
+        attributeName="opacity"
+        values="0;1;0"
+        dur="6s"
+        repeatCount="indefinite"/>
+    </circle>
+
+
+    <circle r="2">
+      <animate
+        attributeName="cx"
+        values="300;370;430"
+        dur="7s"
+        repeatCount="indefinite"/>
+
+      <animate
+        attributeName="cy"
+        values="270;245;260"
+        dur="7s"
+        repeatCount="indefinite"/>
+
+      <animate
+        attributeName="opacity"
+        values="0;0.8;0"
+        dur="7s"
+        repeatCount="indefinite"/>
+    </circle>
+
+  </g>
+
+
+  <!-- ============================================= -->
+  <!-- ESTRELAS FIXAS -->
+  <!-- ============================================= -->
+
+  <g fill="#bdeeff">
+
+    <circle cx="80" cy="30" r="1.5"/>
+    <circle cx="210" cy="270" r="1"/>
+    <circle cx="730" cy="28" r="1.5"/>
+    <circle cx="830" cy="265" r="1"/>
+
+  </g>
+
+</svg>
