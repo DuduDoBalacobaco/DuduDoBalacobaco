@@ -84,6 +84,32 @@ STAR_COLOR = (180, 230, 255, 255)
 
 
 # ============================================================
+# CONFIGURAÇÃO DA MOLDURA
+# ============================================================
+
+# Espessura da moldura
+FRAME_SIZE = 14
+
+# Espaço entre o gráfico e a moldura
+FRAME_PADDING = 5
+
+# Tamanho final da imagem
+TOTAL_WIDTH = (
+    GRAPH_WIDTH
+    + (FRAME_SIZE + FRAME_PADDING) * 2
+)
+
+TOTAL_HEIGHT = (
+    GRAPH_HEIGHT
+    + (FRAME_SIZE + FRAME_PADDING) * 2
+)
+
+# Onde o gráfico começa dentro da imagem
+GRAPH_OFFSET_X = FRAME_SIZE + FRAME_PADDING
+GRAPH_OFFSET_Y = FRAME_SIZE + FRAME_PADDING
+
+
+# ============================================================
 # CONVERTER VERDE → AZUL
 # ============================================================
 
@@ -176,7 +202,7 @@ for y in range(ranni.height):
 
 
 # ============================================================
-# CARREGAR ESPADA
+# CARREGAR TEXTURA DO CABO
 # ============================================================
 
 sword = Image.open(
@@ -185,19 +211,38 @@ sword = Image.open(
 
 
 # ============================================================
-# REMOVER FUNDO PRETO DA ESPADA
+# RECORTAR SOMENTE O CABO DA ESPADA
 # ============================================================
 
-pixels = sword.load()
+# A textura vem da parte vertical do cabo.
+#
+# Não usamos a lâmina.
+# Não usamos a guarda.
+# Apenas a parte trançada do cabo.
 
-for y in range(sword.height):
+handle_texture = sword.crop(
+    (
+        450,
+        1450,
+        590,
+        1850
+    )
+)
 
-    for x in range(sword.width):
+
+# ============================================================
+# REMOVER FUNDO PRETO DA TEXTURA
+# ============================================================
+
+pixels = handle_texture.load()
+
+for y in range(handle_texture.height):
+
+    for x in range(handle_texture.width):
 
         r, g, b, a = pixels[x, y]
 
-        # Detecta o fundo preto
-        if r < 30 and g < 30 and b < 30:
+        if r < 35 and g < 35 and b < 35:
 
             pixels[x, y] = (
                 0,
@@ -208,55 +253,364 @@ for y in range(sword.height):
 
 
 # ============================================================
-# CORTAR ESPAÇOS VAZIOS DA ESPADA
+# CORTAR ESPAÇO TRANSPARENTE
 # ============================================================
 
-bbox = sword.getbbox()
+bbox = handle_texture.getbbox()
 
 if bbox:
-    sword = sword.crop(bbox)
+    handle_texture = handle_texture.crop(bbox)
 
 
 # ============================================================
-# GIRAR ESPADA PARA HORIZONTAL
+# CRIAR TEXTURA HORIZONTAL
 # ============================================================
 
-sword = sword.rotate(
+horizontal_texture = handle_texture.rotate(
     90,
     expand=True
 )
 
 
-# ============================================================
-# REDIMENSIONAR ESPADA
-# ============================================================
-
-# Mantém uma margem nas laterais
-SWORD_WIDTH = GRAPH_WIDTH - 30
-
-sword.thumbnail(
-    (SWORD_WIDTH, 150),
+# Redimensiona para a espessura da moldura
+horizontal_texture = horizontal_texture.resize(
+    (
+        horizontal_texture.width,
+        FRAME_SIZE
+    ),
     Image.Resampling.LANCZOS
 )
 
 
 # ============================================================
-# ESPAÇO RESERVADO PARA A ESPADA
+# CRIAR TEXTURA VERTICAL
 # ============================================================
 
-SWORD_MARGIN_TOP = 8
-SWORD_MARGIN_BOTTOM = 8
-
-SWORD_SPACE = (
-    sword.height
-    + SWORD_MARGIN_TOP
-    + SWORD_MARGIN_BOTTOM
+vertical_texture = handle_texture.resize(
+    (
+        FRAME_SIZE,
+        handle_texture.height
+    ),
+    Image.Resampling.LANCZOS
 )
 
-TOTAL_HEIGHT = (
-    GRAPH_HEIGHT
-    + SWORD_SPACE
+
+# ============================================================
+# FUNÇÃO PARA CRIAR UMA FAIXA DE TEXTURA
+# ============================================================
+
+def create_texture_strip(
+    texture,
+    width,
+    height,
+    horizontal=True
+):
+
+    strip = Image.new(
+        "RGBA",
+        (
+            width,
+            height
+        ),
+        (
+            0,
+            0,
+            0,
+            0
+        )
+    )
+
+    # Tamanho do pedaço que será repetido
+    if horizontal:
+        tile_width = texture.width
+        tile_height = height
+    else:
+        tile_width = width
+        tile_height = texture.height
+
+    position = 0
+
+    while position < (
+        width if horizontal else height
+    ):
+
+        if horizontal:
+
+            tile = texture
+
+            remaining = width - position
+
+            if tile.width > remaining:
+
+                tile = tile.crop(
+                    (
+                        0,
+                        0,
+                        remaining,
+                        tile.height
+                    )
+                )
+
+            strip.alpha_composite(
+                tile,
+                (
+                    position,
+                    0
+                )
+            )
+
+            position += tile_width
+
+        else:
+
+            tile = texture
+
+            remaining = height - position
+
+            if tile.height > remaining:
+
+                tile = tile.crop(
+                    (
+                        0,
+                        0,
+                        tile.width,
+                        remaining
+                    )
+                )
+
+            strip.alpha_composite(
+                tile,
+                (
+                    0,
+                    position
+                )
+            )
+
+            position += tile_height
+
+    return strip
+
+
+# ============================================================
+# CRIAR AS QUATRO PARTES DA MOLDURA
+# ============================================================
+
+top_frame = create_texture_strip(
+    horizontal_texture,
+    TOTAL_WIDTH,
+    FRAME_SIZE,
+    horizontal=True
 )
+
+bottom_frame = create_texture_strip(
+    horizontal_texture,
+    TOTAL_WIDTH,
+    FRAME_SIZE,
+    horizontal=True
+)
+
+left_frame = create_texture_strip(
+    vertical_texture,
+    FRAME_SIZE,
+    TOTAL_HEIGHT,
+    horizontal=False
+)
+
+right_frame = create_texture_strip(
+    vertical_texture,
+    FRAME_SIZE,
+    TOTAL_HEIGHT,
+    horizontal=False
+)
+
+
+# ============================================================
+# CRIAR CANTOS DA MOLDURA
+# ============================================================
+
+# Os cantos recebem pequenos pedaços da própria textura
+# para evitar que fique parecendo quatro linhas separadas.
+
+corner_size = FRAME_SIZE
+
+
+def create_corner(rotation):
+
+    corner = handle_texture.copy()
+
+    corner.thumbnail(
+        (
+            corner_size * 2,
+            corner_size * 2
+        ),
+        Image.Resampling.LANCZOS
+    )
+
+    corner = corner.rotate(
+        rotation,
+        expand=True
+    )
+
+    corner = corner.resize(
+        (
+            corner_size,
+            corner_size
+        ),
+        Image.Resampling.LANCZOS
+    )
+
+    return corner
+
+
+corner_tl = create_corner(90)
+corner_tr = create_corner(180)
+corner_bl = create_corner(0)
+corner_br = create_corner(270)
+
+
+# ============================================================
+# DESENHAR MOLDURA
+# ============================================================
+
+def draw_frame(image):
+
+    # --------------------------------------------------------
+    # GLOW SUAVE
+    # --------------------------------------------------------
+
+    frame_layer = Image.new(
+        "RGBA",
+        image.size,
+        (
+            0,
+            0,
+            0,
+            0
+        )
+    )
+
+    frame_layer.alpha_composite(
+        top_frame,
+        (
+            0,
+            0
+        )
+    )
+
+    frame_layer.alpha_composite(
+        bottom_frame,
+        (
+            0,
+            TOTAL_HEIGHT - FRAME_SIZE
+        )
+    )
+
+    frame_layer.alpha_composite(
+        left_frame,
+        (
+            0,
+            0
+        )
+    )
+
+    frame_layer.alpha_composite(
+        right_frame,
+        (
+            TOTAL_WIDTH - FRAME_SIZE,
+            0
+        )
+    )
+
+    # Glow muito discreto
+    glow = frame_layer.filter(
+        ImageFilter.GaussianBlur(3)
+    )
+
+    alpha = glow.getchannel("A")
+
+    alpha = alpha.point(
+        lambda value: int(value * 0.22)
+    )
+
+    glow.putalpha(alpha)
+
+    image.alpha_composite(
+        glow
+    )
+
+    # --------------------------------------------------------
+    # MOLDURA ORIGINAL
+    # --------------------------------------------------------
+
+    image.alpha_composite(
+        top_frame,
+        (
+            0,
+            0
+        )
+    )
+
+    image.alpha_composite(
+        bottom_frame,
+        (
+            0,
+            TOTAL_HEIGHT - FRAME_SIZE
+        )
+    )
+
+    image.alpha_composite(
+        left_frame,
+        (
+            0,
+            0
+        )
+    )
+
+    image.alpha_composite(
+        right_frame,
+        (
+            TOTAL_WIDTH - FRAME_SIZE,
+            0
+        )
+    )
+
+    # --------------------------------------------------------
+    # CANTOS
+    # --------------------------------------------------------
+
+    image.alpha_composite(
+        corner_tl,
+        (
+            0,
+            0
+        )
+    )
+
+    image.alpha_composite(
+        corner_tr,
+        (
+            TOTAL_WIDTH - FRAME_SIZE,
+            0
+        )
+    )
+
+    image.alpha_composite(
+        corner_bl,
+        (
+            0,
+            TOTAL_HEIGHT - FRAME_SIZE
+        )
+    )
+
+    image.alpha_composite(
+        corner_br,
+        (
+            TOTAL_WIDTH - FRAME_SIZE,
+            TOTAL_HEIGHT - FRAME_SIZE
+        )
+    )
+
+    return image
 
 
 # ============================================================
@@ -271,8 +625,15 @@ for x, week in enumerate(weeks):
         week["contributionDays"]
     ):
 
-        px = x * (CELL_SIZE + GAP)
-        py = y * (CELL_SIZE + GAP)
+        px = (
+            GRAPH_OFFSET_X
+            + x * (CELL_SIZE + GAP)
+        )
+
+        py = (
+            GRAPH_OFFSET_Y
+            + y * (CELL_SIZE + GAP)
+        )
 
         cells.append(
             {
@@ -289,33 +650,37 @@ for x, week in enumerate(weeks):
 # ============================================================
 
 ranni_x = (
-    GRAPH_WIDTH - ranni.width
-) // 2
+    GRAPH_OFFSET_X
+    + (
+        GRAPH_WIDTH
+        - ranni.width
+    ) // 2
+)
 
 ranni_y = (
-    GRAPH_HEIGHT - ranni.height
-) // 2
+    GRAPH_OFFSET_Y
+    + (
+        GRAPH_HEIGHT
+        - ranni.height
+    ) // 2
+)
 
 
 # ============================================================
 # ESCOLHER ALVOS ALEATÓRIOS
 # ============================================================
 
-# Somente quadrados que possuem contribuição
 targets = [
     cell
     for cell in cells
     if cell["count"] > 0
 ]
 
-
-# Embaralha completamente
+# Aleatório a cada execução
 random.shuffle(targets)
 
-
-# Pega no máximo 12
-# Como a lista foi embaralhada e cada célula
-# existe apenas uma vez, não haverá repetição.
+# No máximo 12
+# Nunca haverá repetição dentro da mesma animação.
 targets = targets[:12]
 
 
@@ -328,14 +693,13 @@ def draw_graph(activated):
     image = Image.new(
         "RGBA",
         (
-            GRAPH_WIDTH,
-            TOTAL_HEIGHT,
+            TOTAL_WIDTH,
+            TOTAL_HEIGHT
         ),
-        BACKGROUND,
+        BACKGROUND
     )
 
     draw = ImageDraw.Draw(image)
-
 
     # ========================================================
     # QUADRADOS
@@ -351,9 +715,8 @@ def draw_graph(activated):
 
             color = GRAY
 
-
         # ----------------------------------------------------
-        # FOI ATINGIDO PELA ESTRELA
+        # FOI ATINGIDO
         # ----------------------------------------------------
 
         elif cell in activated:
@@ -362,19 +725,16 @@ def draw_graph(activated):
                 cell["color"]
             )
 
-
         # ----------------------------------------------------
         # CONTRIBUIÇÃO NORMAL
-        # MANTÉM O VERDE ORIGINAL
         # ----------------------------------------------------
 
         else:
 
             color = cell["color"]
 
-
         # ----------------------------------------------------
-        # DESENHAR QUADRADO
+        # DESENHAR
         # ----------------------------------------------------
 
         x = cell["x"]
@@ -391,7 +751,6 @@ def draw_graph(activated):
             fill=color,
         )
 
-
     return image
 
 
@@ -401,18 +760,15 @@ def draw_graph(activated):
 
 frames = []
 
-
 for frame_number in range(FRAMES):
-
 
     # ========================================================
     # QUADRADOS ATIVADOS
     # ========================================================
 
-    # A cada 10 frames uma estrela chega
     activated_count = min(
         len(targets),
-        frame_number // 10,
+        frame_number // 10
     )
 
     activated = targets[
@@ -437,8 +793,8 @@ for frame_number in range(FRAMES):
         ranni,
         (
             ranni_x,
-            ranni_y,
-        ),
+            ranni_y
+        )
     )
 
 
@@ -448,12 +804,10 @@ for frame_number in range(FRAMES):
 
     draw = ImageDraw.Draw(image)
 
-
     for i, target in enumerate(targets):
 
-
         # ----------------------------------------------------
-        # ORIGEM = CENTRO DA RANNI
+        # ORIGEM
         # ----------------------------------------------------
 
         start_x = (
@@ -468,7 +822,7 @@ for frame_number in range(FRAMES):
 
 
         # ----------------------------------------------------
-        # DESTINO = CENTRO DO QUADRADO
+        # DESTINO
         # ----------------------------------------------------
 
         target_x = (
@@ -483,16 +837,16 @@ for frame_number in range(FRAMES):
 
 
         # ----------------------------------------------------
-        # MOVIMENTO DA ESTRELA
+        # MOVIMENTO
         # ----------------------------------------------------
 
         progress = (
-            frame_number - i * 10
+            frame_number
+            - i * 10
         ) / 20
 
 
         if 0 <= progress <= 1:
-
 
             x = int(
                 start_x
@@ -512,7 +866,7 @@ for frame_number in range(FRAMES):
 
 
             # =================================================
-            # GLOW DA ESTRELA
+            # GLOW
             # =================================================
 
             glow = Image.new(
@@ -522,15 +876,13 @@ for frame_number in range(FRAMES):
                     0,
                     0,
                     0,
-                    0,
-                ),
+                    0
+                )
             )
-
 
             glow_draw = ImageDraw.Draw(
                 glow
             )
-
 
             glow_draw.ellipse(
                 [
@@ -543,17 +895,13 @@ for frame_number in range(FRAMES):
                     100,
                     200,
                     255,
-                    100,
-                ),
-            )
-
-
-            glow = glow.filter(
-                ImageFilter.GaussianBlur(
-                    5
+                    100
                 )
             )
 
+            glow = glow.filter(
+                ImageFilter.GaussianBlur(5)
+            )
 
             image.alpha_composite(
                 glow
@@ -564,8 +912,9 @@ for frame_number in range(FRAMES):
             # ESTRELA
             # =================================================
 
-            draw = ImageDraw.Draw(image)
-
+            draw = ImageDraw.Draw(
+                image
+            )
 
             draw.line(
                 [
@@ -573,9 +922,8 @@ for frame_number in range(FRAMES):
                     (x + 4, y),
                 ],
                 fill=STAR_COLOR,
-                width=2,
+                width=2
             )
-
 
             draw.line(
                 [
@@ -583,83 +931,16 @@ for frame_number in range(FRAMES):
                     (x, y + 4),
                 ],
                 fill=STAR_COLOR,
-                width=2,
+                width=2
             )
 
 
     # ========================================================
-    # ESPADA / MOLDURA
+    # MOLDURA
     # ========================================================
 
-    sword_x = (
-        GRAPH_WIDTH - sword.width
-    ) // 2
-
-    sword_y = (
-        GRAPH_HEIGHT
-        + SWORD_MARGIN_TOP
-    )
-
-
-    # ========================================================
-    # GLOW DA ESPADA
-    # ========================================================
-
-    sword_glow = Image.new(
-        "RGBA",
-        image.size,
-        (
-            0,
-            0,
-            0,
-            0,
-        ),
-    )
-
-
-    sword_glow_x = sword_x
-    sword_glow_y = sword_y
-
-
-    sword_glow.alpha_composite(
-        sword,
-        (
-            sword_glow_x,
-            sword_glow_y,
-        ),
-    )
-
-
-    sword_glow = sword_glow.filter(
-        ImageFilter.GaussianBlur(4)
-    )
-
-
-    # Deixa o glow mais discreto
-    alpha = sword_glow.getchannel("A")
-
-    alpha = alpha.point(
-        lambda value: int(value * 0.25)
-    )
-
-    sword_glow.putalpha(alpha)
-
-
-    image.alpha_composite(
-        sword_glow
-    )
-
-
-    # ========================================================
-    # ESPADA ORIGINAL
-    # ========================================================
-
-    image.alpha_composite(
-        sword,
-        (
-            sword_x,
-            sword_y,
-        ),
+    image = draw_frame(
+        image
     )
 
 
@@ -678,15 +959,13 @@ for frame_number in range(FRAMES):
 
 os.makedirs(
     "generated",
-    exist_ok=True,
+    exist_ok=True
 )
-
 
 output = (
     "generated/"
     "ranni-contributions.gif"
 )
-
 
 frames[0].save(
     output,
@@ -694,9 +973,8 @@ frames[0].save(
     append_images=frames[1:],
     duration=FRAME_DURATION,
     loop=0,
-    optimize=False,
+    optimize=False
 )
-
 
 print(
     f"Gráfico gerado: {output}"
