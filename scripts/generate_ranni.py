@@ -5,6 +5,10 @@ import requests
 from PIL import Image, ImageDraw, ImageFilter
 
 
+# ============================================================
+# GITHUB API
+# ============================================================
+
 TOKEN = os.environ["GH_TOKEN"]
 USERNAME = os.environ["GITHUB_USERNAME"]
 
@@ -36,7 +40,9 @@ response = requests.post(
     API_URL,
     json={
         "query": QUERY,
-        "variables": {"login": USERNAME},
+        "variables": {
+            "login": USERNAME
+        },
     },
     headers=headers,
 )
@@ -63,33 +69,102 @@ GAP = 3
 GRAPH_WIDTH = len(weeks) * (CELL_SIZE + GAP)
 GRAPH_HEIGHT = 7 * (CELL_SIZE + GAP)
 
-# Mais frames + maior duração = animação mais lenta
+# Animação mais lenta
 FRAMES = 120
 FRAME_DURATION = 100
 
 # Fundo
 BACKGROUND = (24, 28, 34, 255)
 
-# Quadrados normais
+# Quadrados sem contribuição
 GRAY = (75, 82, 92, 255)
 
-# Quadrados atingidos pelas estrelas
-BLUE = (80, 180, 255, 255)
-
+# Cor das estrelas
 STAR_COLOR = (180, 230, 255, 255)
+
+
+# ============================================================
+# CONVERTER VERDE DO GITHUB PARA AZUL
+# ============================================================
+
+def green_to_blue(color):
+    """
+    Converte a cor original do GitHub para uma
+    tonalidade azul mantendo a intensidade.
+    """
+
+    # Remove #
+    color = color.lstrip("#")
+
+    # RGB original
+    r = int(color[0:2], 16)
+    g = int(color[2:4], 16)
+    b = int(color[4:6], 16)
+
+    # A intensidade das contribuições do GitHub
+    # é representada principalmente pelo verde.
+    intensity = g / 255
+
+    # Azul aumenta conforme a intensidade aumenta
+    blue = int(110 + intensity * 145)
+
+    # Mantém um pouco de verde para criar
+    # um azul mais bonito/ciano
+    green = int(90 + intensity * 100)
+
+    # Vermelho baixo
+    red = int(30 + intensity * 40)
+
+    return (
+        red,
+        green,
+        blue,
+        255,
+    )
+
+
+# ============================================================
+# AZUL MAIS FORTE PARA QUADRADO ATINGIDO
+# ============================================================
+
+def activated_blue(color):
+    """
+    Deixa o quadrado atingido pela estrela
+    mais brilhante que sua cor normal.
+    """
+
+    base = green_to_blue(color)
+
+    r, g, b, a = base
+
+    return (
+        min(255, r + 25),
+        min(255, g + 35),
+        min(255, b + 25),
+        255,
+    )
 
 
 # ============================================================
 # CARREGAR RANNI
 # ============================================================
 
-ranni = Image.open("assets/ranni.gif").convert("RGBA")
+ranni = Image.open(
+    "assets/ranni.gif"
+).convert("RGBA")
+
 
 # Recorta apenas a região onde está a Ranni
-ranni = ranni.crop((320, 490, 490, 811))
+ranni = ranni.crop(
+    (320, 490, 490, 811)
+)
 
-# Redimensiona para caber no gráfico
-ranni.thumbnail((100, 100), Image.Resampling.LANCZOS)
+
+# Redimensiona
+ranni.thumbnail(
+    (100, 100),
+    Image.Resampling.LANCZOS
+)
 
 
 # ============================================================
@@ -99,45 +174,62 @@ ranni.thumbnail((100, 100), Image.Resampling.LANCZOS)
 pixels = ranni.load()
 
 for y in range(ranni.height):
+
     for x in range(ranni.width):
 
         r, g, b, a = pixels[x, y]
 
+        # Preto vira transparente
         if r < 30 and g < 30 and b < 30:
-            pixels[x, y] = (0, 0, 0, 0)
+
+            pixels[x, y] = (
+                0,
+                0,
+                0,
+                0,
+            )
 
 
 # ============================================================
-# PEGAR CÉLULAS
+# PEGAR CÉLULAS DO GRÁFICO
 # ============================================================
 
 cells = []
 
 for x, week in enumerate(weeks):
 
-    for y, day in enumerate(week["contributionDays"]):
+    for y, day in enumerate(
+        week["contributionDays"]
+    ):
 
         px = x * (CELL_SIZE + GAP)
         py = y * (CELL_SIZE + GAP)
 
-        cells.append({
-            "x": px,
-            "y": py,
-            "color": day["color"],
-            "count": day["contributionCount"],
-        })
+        cells.append(
+            {
+                "x": px,
+                "y": py,
+                "color": day["color"],
+                "count": day["contributionCount"],
+            }
+        )
 
 
 # ============================================================
 # POSIÇÃO DA RANNI
 # ============================================================
 
-ranni_x = (GRAPH_WIDTH - ranni.width) // 2
-ranni_y = (GRAPH_HEIGHT - ranni.height) // 2
+ranni_x = (
+    GRAPH_WIDTH - ranni.width
+) // 2
+
+ranni_y = (
+    GRAPH_HEIGHT - ranni.height
+) // 2
 
 
 # ============================================================
-# ESCOLHER ALVOS
+# ESCOLHER QUADRADOS QUE RECEBERÃO ESTRELAS
 # ============================================================
 
 random.seed(42)
@@ -150,6 +242,7 @@ targets = [
 
 random.shuffle(targets)
 
+# Quantidade de estrelas
 targets = targets[:12]
 
 
@@ -161,7 +254,10 @@ def draw_graph(activated):
 
     image = Image.new(
         "RGBA",
-        (GRAPH_WIDTH, GRAPH_HEIGHT),
+        (
+            GRAPH_WIDTH,
+            GRAPH_HEIGHT,
+        ),
         BACKGROUND,
     )
 
@@ -169,12 +265,40 @@ def draw_graph(activated):
 
     for cell in cells:
 
-        # Todos os quadrados começam cinza
-        color = GRAY
+        # ----------------------------------------------------
+        # SEM CONTRIBUIÇÃO
+        # ----------------------------------------------------
 
-        # Quadrado atingido pela estrela fica azul
-        if cell in activated:
-            color = BLUE
+        if cell["count"] == 0:
+
+            color = GRAY
+
+
+        # ----------------------------------------------------
+        # QUADRADO ATINGIDO PELA ESTRELA
+        # ----------------------------------------------------
+
+        elif cell in activated:
+
+            color = activated_blue(
+                cell["color"]
+            )
+
+
+        # ----------------------------------------------------
+        # CONTRIBUIÇÃO NORMAL
+        # ----------------------------------------------------
+
+        else:
+
+            color = green_to_blue(
+                cell["color"]
+            )
+
+
+        # ----------------------------------------------------
+        # DESENHAR QUADRADO
+        # ----------------------------------------------------
 
         x = cell["x"]
         y = cell["y"]
@@ -199,70 +323,121 @@ def draw_graph(activated):
 
 frames = []
 
+
 for frame_number in range(FRAMES):
 
-    # Cada estrela ativa um quadrado progressivamente
+    # --------------------------------------------------------
+    # QUANTOS QUADRADOS JÁ FORAM ATIVADOS
+    # --------------------------------------------------------
+
     activated_count = min(
         len(targets),
-        frame_number // 10
+        frame_number // 10,
     )
 
-    activated = targets[:activated_count]
+    activated = targets[
+        :activated_count
+    ]
 
-    image = draw_graph(activated)
+
+    # --------------------------------------------------------
+    # GRÁFICO
+    # --------------------------------------------------------
+
+    image = draw_graph(
+        activated
+    )
 
 
-    # ========================================================
+    # --------------------------------------------------------
     # RANNI
-    # ========================================================
+    # --------------------------------------------------------
 
     image.alpha_composite(
         ranni,
-        (ranni_x, ranni_y),
+        (
+            ranni_x,
+            ranni_y,
+        ),
     )
 
 
-    # ========================================================
+    # --------------------------------------------------------
     # ESTRELAS
-    # ========================================================
+    # --------------------------------------------------------
 
     draw = ImageDraw.Draw(image)
 
     for i, target in enumerate(targets):
 
-        start_x = ranni_x + ranni.width // 2
-        start_y = ranni_y + ranni.height // 2
+        # Ponto inicial = centro da Ranni
+        start_x = (
+            ranni_x
+            + ranni.width // 2
+        )
 
-        target_x = target["x"] + CELL_SIZE // 2
-        target_y = target["y"] + CELL_SIZE // 2
+        start_y = (
+            ranni_y
+            + ranni.height // 2
+        )
 
-        # Movimento mais lento
-        progress = (frame_number - i * 10) / 20
+
+        # Ponto final = centro do quadrado
+        target_x = (
+            target["x"]
+            + CELL_SIZE // 2
+        )
+
+        target_y = (
+            target["y"]
+            + CELL_SIZE // 2
+        )
+
+
+        # ----------------------------------------------------
+        # MOVIMENTO DA ESTRELA
+        # ----------------------------------------------------
+
+        progress = (
+            frame_number - i * 10
+        ) / 20
+
 
         if 0 <= progress <= 1:
 
             x = int(
-                start_x +
-                (target_x - start_x) * progress
+                start_x
+                + (
+                    target_x - start_x
+                ) * progress
             )
 
             y = int(
-                start_y +
-                (target_y - start_y) * progress
+                start_y
+                + (
+                    target_y - start_y
+                ) * progress
             )
 
 
             # =================================================
-            # BRILHO
+            # GLOW
             # =================================================
 
             glow = Image.new(
                 "RGBA",
                 image.size,
-                (0, 0, 0, 0),
+                (
+                    0,
+                    0,
+                    0,
+                    0,
+                ),
             )
 
-            glow_draw = ImageDraw.Draw(glow)
+            glow_draw = ImageDraw.Draw(
+                glow
+            )
 
             glow_draw.ellipse(
                 [
@@ -271,45 +446,76 @@ for frame_number in range(FRAMES):
                     x + 8,
                     y + 8,
                 ],
-                fill=(100, 200, 255, 100),
+                fill=(
+                    100,
+                    200,
+                    255,
+                    100,
+                ),
             )
 
             glow = glow.filter(
-                ImageFilter.GaussianBlur(5)
+                ImageFilter.GaussianBlur(
+                    5
+                )
             )
 
-            image.alpha_composite(glow)
+            image.alpha_composite(
+                glow
+            )
 
 
             # =================================================
             # ESTRELA
             # =================================================
 
-            draw = ImageDraw.Draw(image)
+            draw = ImageDraw.Draw(
+                image
+            )
 
+            # Horizontal
             draw.line(
-                [(x - 4, y), (x + 4, y)],
+                [
+                    (x - 4, y),
+                    (x + 4, y),
+                ],
                 fill=STAR_COLOR,
                 width=2,
             )
 
+            # Vertical
             draw.line(
-                [(x, y - 4), (x, y + 4)],
+                [
+                    (x, y - 4),
+                    (x, y + 4),
+                ],
                 fill=STAR_COLOR,
                 width=2,
             )
 
 
-    frames.append(image.convert("P"))
+    # --------------------------------------------------------
+    # ADICIONAR FRAME
+    # --------------------------------------------------------
+
+    frames.append(
+        image.convert("P")
+    )
 
 
 # ============================================================
 # SALVAR GIF
 # ============================================================
 
-os.makedirs("generated", exist_ok=True)
+os.makedirs(
+    "generated",
+    exist_ok=True,
+)
 
-output = "generated/ranni-contributions.gif"
+output = (
+    "generated/"
+    "ranni-contributions.gif"
+)
 
 frames[0].save(
     output,
@@ -320,4 +526,6 @@ frames[0].save(
     optimize=False,
 )
 
-print(f"Gráfico gerado: {output}")
+print(
+    f"Gráfico gerado: {output}"
+)
