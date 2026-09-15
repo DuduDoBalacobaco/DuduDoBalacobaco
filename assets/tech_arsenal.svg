@@ -1,0 +1,71 @@
+<svg width="900" height="90" viewBox="0 0 900 90"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="ice" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#355f88"/>
+      <stop offset="35%" stop-color="#7ddcff"/>
+      <stop offset="50%" stop-color="#d2f4ff"/>
+      <stop offset="65%" stop-color="#7ddcff"/>
+      <stop offset="100%" stop-color="#355f88"/>
+    </linearGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Ornamento esquerdo -->
+  <path
+    d="M60 45
+       H245
+       L270 30
+       L285 45
+       L270 60
+       L245 45"
+    fill="none"
+    stroke="url(#ice)"
+    stroke-width="2"
+    filter="url(#glow)"
+  />
+
+  <circle cx="60" cy="45" r="4"
+          fill="#9eeaff"
+          filter="url(#glow)"/>
+
+  <!-- Título -->
+  <text
+    x="450"
+    y="54"
+    text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="28"
+    letter-spacing="6"
+    fill="url(#ice)"
+    filter="url(#glow)">
+    TECH ARSENAL
+  </text>
+
+  <!-- Ornamento direito -->
+  <path
+    d="M840 45
+       H655
+       L630 30
+       L615 45
+       L630 60
+       L655 45"
+    fill="none"
+    stroke="url(#ice)"
+    stroke-width="2"
+    filter="url(#glow)"
+  />
+
+  <circle cx="840" cy="45" r="4"
+          fill="#9eeaff"
+          filter="url(#glow)"/>
+
+</svg>
