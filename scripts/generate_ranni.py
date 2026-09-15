@@ -401,9 +401,8 @@ for frame_number in range(FRAMES):
     # RANNI
     # --------------------------------------------------------
 
-    ranni = ranni_frames[
-        frame_number % len(ranni_frames)
-    ]
+    # Ranni fica completamente fixa
+    ranni = ranni_frames[0]
 
     image.alpha_composite(
         ranni,
@@ -411,7 +410,7 @@ for frame_number in range(FRAMES):
             ranni_x,
             ranni_y,
         ),
-    )
+    ),
 
     frames.append(
         image.convert("P", palette=Image.Palette.ADAPTIVE)
