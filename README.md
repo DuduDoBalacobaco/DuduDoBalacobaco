@@ -16,19 +16,13 @@
 
 ### 🌙 As várias faces de mim?
 
-Backend Developer focado em **Java e Spring Boot**.
+Sou desenvolvedor Backend com foco em **Java e Spring Boot**, sempre buscando transformar ideias em projetos que me desafiem a aprender algo novo.
 
-Atualmente estudando e desenvolvendo projetos com:
+Gosto especialmente de desenvolver **APIs**, trabalhar com **bancos de dados** e entender o que acontece além do código — arquitetura, segurança, comunicação entre serviços e as decisões por trás de uma aplicação bem construída.
 
-- Java
-- Spring Boot
-- PostgreSQL
-- Docker
-- Kafka
-- JavaScript / TypeScript
+Atualmente, venho aprofundando meus conhecimentos no ecossistema **Spring**, além de explorar **microsserviços, Kafka e arquitetura de software**.
 
-Gosto de construir APIs, estudar arquitetura de software
-e explorar novas tecnologias.
+Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fizeram parte importante da minha trajetória e continuam presentes em alguns dos meus projetos.
 
   </td>
 
