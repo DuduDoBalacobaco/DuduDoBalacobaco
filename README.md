@@ -67,9 +67,9 @@ e explorar novas tecnologias.
  ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white)
 
 
-<table>
+<table align="center">
   <tr>
-    <td width="50%" valign="top">
+    <td width="50%" valign="top" align="center">
 
 ### 🌙 Pokédex
 
@@ -83,8 +83,8 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
 
   </td>
 
-  <td>
-    <img src="./assets/ranni_v4_pokebola.png" width="300">
+  <td align="center">
+    <img src="./assets/ranni_v4_pokebola.png" width="200">
   </td>
 
   </tr>
