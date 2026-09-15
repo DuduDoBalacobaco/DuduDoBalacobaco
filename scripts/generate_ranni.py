@@ -84,85 +84,67 @@ GLOW = (80, 190, 255, 130)
 
 
 # ============================================================
-# CARREGAR RANNI
+# CARREGAR RANNI - FRAME FIXO
 # ============================================================
 
 ranni_source = Image.open("assets/ranni.gif")
 
-ranni_frames = []
+# Pega SOMENTE o primeiro frame.
+# A Ranni não terá nenhuma animação própria.
+ranni_source.seek(0)
 
-try:
-    while True:
+ranni = ranni_source.convert("RGBA").copy()
 
-        frame = ranni_source.convert("RGBA")
+# ------------------------------------------------------------
+# RECORTAR A RANNI
+# ------------------------------------------------------------
 
-        # ----------------------------------------------------
-        # REMOVER FUNDO PRETO
-        # ----------------------------------------------------
+# A imagem original possui bastante espaço preto.
+ranni = ranni.crop((320, 490, 490, 811))
 
-        pixels = frame.load()
+# ------------------------------------------------------------
+# REMOVER FUNDO PRETO
+# ------------------------------------------------------------
 
-        for y in range(frame.height):
-            for x in range(frame.width):
+pixels = ranni.load()
 
-                r, g, b, a = pixels[x, y]
+for y in range(ranni.height):
+    for x in range(ranni.width):
 
-                # Quanto mais preto, mais transparente
-                brightness = r + g + b
+        r, g, b, a = pixels[x, y]
 
-                if brightness < 80:
-                    pixels[x, y] = (0, 0, 0, 0)
+        brightness = r + g + b
 
-                elif brightness < 140:
-                    # Transição suave para transparência
-                    alpha = int((brightness - 80) / 60 * 255)
-                    pixels[x, y] = (r, g, b, alpha)
+        if brightness < 80:
+            pixels[x, y] = (0, 0, 0, 0)
 
-        # ----------------------------------------------------
-        # CORTAR ESPAÇOS TRANSPARENTES
-        # ----------------------------------------------------
+        elif brightness < 140:
+            alpha = int((brightness - 80) / 60 * 255)
+            pixels[x, y] = (r, g, b, alpha)
 
-        bbox = frame.getbbox()
+# ------------------------------------------------------------
+# RECORTAR NOVAMENTE O ESPAÇO TRANSPARENTE
+# ------------------------------------------------------------
 
-        if bbox:
-            frame = frame.crop(bbox)
+bbox = ranni.getbbox()
 
-        # ----------------------------------------------------
-        # TAMANHO DA RANNI
-        # ----------------------------------------------------
+if bbox:
+    ranni = ranni.crop(bbox)
 
-        target_height = 92
+# ------------------------------------------------------------
+# TAMANHO
+# ------------------------------------------------------------
 
-        ratio = target_height / frame.height
+target_height = 92
 
-        new_width = int(frame.width * ratio)
+ratio = target_height / ranni.height
 
-        frame = frame.resize(
-            (new_width, target_height),
-            Image.Resampling.LANCZOS,
-        )
+new_width = int(ranni.width * ratio)
 
-        ranni_frames.append(frame)
-
-        ranni_source.seek(ranni_source.tell() + 1)
-
-except EOFError:
-    pass
-
-
-if not ranni_frames:
-    raise RuntimeError("Não foi possível carregar a Ranni.")
-
-
-# ============================================================
-# POSIÇÃO DA RANNI
-# ============================================================
-
-ranni_width = max(frame.width for frame in ranni_frames)
-ranni_height = max(frame.height for frame in ranni_frames)
-
-ranni_x = (GRAPH_WIDTH - ranni_width) // 2
-ranni_y = (GRAPH_HEIGHT - ranni_height) // 2
+ranni = ranni.resize(
+    (new_width, target_height),
+    Image.Resampling.LANCZOS,
+)
 
 
 # ============================================================
