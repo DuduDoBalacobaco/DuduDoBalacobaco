@@ -28,7 +28,7 @@ Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fize
 
   <td width="40%" align="center">
 
-<img src="./assets/ranni_cafe_fundo_transparente.gif" width="300">
+<img src="./assets/ranni_cafe_fundo_transparente.gif" width="200">
 
   </td>
   </tr>
