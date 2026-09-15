@@ -84,35 +84,26 @@ STAR_COLOR = (180, 230, 255, 255)
 
 
 # ============================================================
-# CONVERTER VERDE DO GITHUB PARA AZUL
+# CONVERTER VERDE → AZUL
 # ============================================================
 
 def green_to_blue(color):
     """
-    Converte a cor original do GitHub para uma
-    tonalidade azul mantendo a intensidade.
+    Converte a cor verde original do GitHub
+    para uma tonalidade azul equivalente.
     """
 
-    # Remove #
     color = color.lstrip("#")
 
-    # RGB original
     r = int(color[0:2], 16)
     g = int(color[2:4], 16)
     b = int(color[4:6], 16)
 
-    # A intensidade das contribuições do GitHub
-    # é representada principalmente pelo verde.
+    # Intensidade baseada principalmente no verde
     intensity = g / 255
 
-    # Azul aumenta conforme a intensidade aumenta
     blue = int(110 + intensity * 145)
-
-    # Mantém um pouco de verde para criar
-    # um azul mais bonito/ciano
     green = int(90 + intensity * 100)
-
-    # Vermelho baixo
     red = int(30 + intensity * 40)
 
     return (
@@ -124,14 +115,10 @@ def green_to_blue(color):
 
 
 # ============================================================
-# AZUL MAIS FORTE PARA QUADRADO ATINGIDO
+# AZUL MAIS BRILHANTE QUANDO A ESTRELA ATINGE
 # ============================================================
 
 def activated_blue(color):
-    """
-    Deixa o quadrado atingido pela estrela
-    mais brilhante que sua cor normal.
-    """
 
     base = green_to_blue(color)
 
@@ -154,7 +141,7 @@ ranni = Image.open(
 ).convert("RGBA")
 
 
-# Recorta apenas a região onde está a Ranni
+# Recorta apenas a Ranni
 ranni = ranni.crop(
     (320, 490, 490, 811)
 )
@@ -179,7 +166,6 @@ for y in range(ranni.height):
 
         r, g, b, a = pixels[x, y]
 
-        # Preto vira transparente
         if r < 30 and g < 30 and b < 30:
 
             pixels[x, y] = (
@@ -191,7 +177,7 @@ for y in range(ranni.height):
 
 
 # ============================================================
-# PEGAR CÉLULAS DO GRÁFICO
+# PEGAR CÉLULAS
 # ============================================================
 
 cells = []
@@ -229,7 +215,7 @@ ranni_y = (
 
 
 # ============================================================
-# ESCOLHER QUADRADOS QUE RECEBERÃO ESTRELAS
+# ESCOLHER ALVOS
 # ============================================================
 
 random.seed(42)
@@ -242,7 +228,6 @@ targets = [
 
 random.shuffle(targets)
 
-# Quantidade de estrelas
 targets = targets[:12]
 
 
@@ -275,7 +260,7 @@ def draw_graph(activated):
 
 
         # ----------------------------------------------------
-        # QUADRADO ATINGIDO PELA ESTRELA
+        # FOI ATINGIDO PELA ESTRELA
         # ----------------------------------------------------
 
         elif cell in activated:
@@ -287,17 +272,16 @@ def draw_graph(activated):
 
         # ----------------------------------------------------
         # CONTRIBUIÇÃO NORMAL
+        # MANTÉM O VERDE ORIGINAL
         # ----------------------------------------------------
 
         else:
 
-            color = green_to_blue(
-                cell["color"]
-            )
+            color = cell["color"]
 
 
         # ----------------------------------------------------
-        # DESENHAR QUADRADO
+        # DESENHAR
         # ----------------------------------------------------
 
         x = cell["x"]
@@ -326,10 +310,7 @@ frames = []
 
 for frame_number in range(FRAMES):
 
-    # --------------------------------------------------------
-    # QUANTOS QUADRADOS JÁ FORAM ATIVADOS
-    # --------------------------------------------------------
-
+    # A cada 10 frames uma estrela chega
     activated_count = min(
         len(targets),
         frame_number // 10,
@@ -370,7 +351,7 @@ for frame_number in range(FRAMES):
 
     for i, target in enumerate(targets):
 
-        # Ponto inicial = centro da Ranni
+        # Origem = centro da Ranni
         start_x = (
             ranni_x
             + ranni.width // 2
@@ -382,7 +363,7 @@ for frame_number in range(FRAMES):
         )
 
 
-        # Ponto final = centro do quadrado
+        # Destino = centro do quadrado
         target_x = (
             target["x"]
             + CELL_SIZE // 2
@@ -394,10 +375,7 @@ for frame_number in range(FRAMES):
         )
 
 
-        # ----------------------------------------------------
-        # MOVIMENTO DA ESTRELA
-        # ----------------------------------------------------
-
+        # Movimento mais lento
         progress = (
             frame_number - i * 10
         ) / 20
@@ -421,7 +399,7 @@ for frame_number in range(FRAMES):
 
 
             # =================================================
-            # GLOW
+            # GLOW DA ESTRELA
             # =================================================
 
             glow = Image.new(
@@ -473,7 +451,6 @@ for frame_number in range(FRAMES):
                 image
             )
 
-            # Horizontal
             draw.line(
                 [
                     (x - 4, y),
@@ -483,7 +460,6 @@ for frame_number in range(FRAMES):
                 width=2,
             )
 
-            # Vertical
             draw.line(
                 [
                     (x, y - 4),
@@ -495,7 +471,7 @@ for frame_number in range(FRAMES):
 
 
     # --------------------------------------------------------
-    # ADICIONAR FRAME
+    # SALVAR FRAME
     # --------------------------------------------------------
 
     frames.append(
