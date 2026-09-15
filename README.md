@@ -84,7 +84,7 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
   </td>
 
   <td>
-    <img src="./assets/mini_ranni_pokebola.jpg" width="300">
+    <img src="./assets/ranni_v4_pokebola.png" width="300">
   </td>
 
   </tr>
