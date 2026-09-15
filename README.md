@@ -14,7 +14,7 @@
   <tr>
     <td width="60%" valign="top">
 
-### 🌙 As várias faces de mim?
+###  As várias faces de mim
 
 Sou desenvolvedor Backend com foco em **Java e Spring Boot**, sempre buscando transformar ideias em projetos que me desafiem a aprender algo novo.
 
@@ -120,7 +120,7 @@ Pokédex interativa com busca, filtros, favoritos e informações dos Pokémon.
 
   ### Crud de clientes
 
-  Um crud bem completo e bem arquiteturado, com banco de dados.
+  API REST para gerenciamento de clientes, desenvolvida em TypeScript com Node.js e Express, utilizando PostgreSQL e separação em camadas.
 
   **Stack:** Node.js • Express • TypeScript
 
