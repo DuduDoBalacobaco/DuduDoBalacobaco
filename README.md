@@ -10,11 +10,13 @@
   <img src="./assets/about_me.svg" width="900" alt="About me">
 </p>
 
-<table align="center">
-  <tr>
-    <td width="60%" valign="top">
+<div align="center">
 
-###  As várias faces de mim
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 30px;">
+
+  <div style="width: 60%; text-align: left;">
+
+### As várias faces de mim
 
 Sou desenvolvedor Backend com foco em **Java e Spring Boot**, sempre buscando transformar ideias em projetos que me desafiem a aprender algo novo.
 
@@ -24,16 +26,15 @@ Atualmente, venho aprofundando meus conhecimentos no ecossistema **Spring**, al�
 
 Também tenho experiência com **JavaScript e TypeScript**, tecnologias que fizeram parte importante da minha trajetória e continuam presentes em alguns dos meus projetos.
 
-  </td>
+  </div>
 
-  <td width="40%" align="center">
+  <div style="width: 40%; text-align: center;">
+    <img src="./assets/ranni_cafe_fundo_transparente.gif" width="200">
+  </div>
 
-<img src="./assets/ranni_cafe_fundo_transparente.gif" width="200">
+  </div>
 
-  </td>
-  </tr>
-</table>
-
+</div>
 
 <p align="center">
   <img src="./assets/tech_arsenal.svg" width="900" alt="Tech Arsenal">
