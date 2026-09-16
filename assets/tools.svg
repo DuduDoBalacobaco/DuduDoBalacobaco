@@ -22,11 +22,11 @@
   <!-- Esquerda -->
   <path
     d="M40 28
-       H145
-       L160 19
-       L170 28
-       L160 37
-       L145 28"
+       H175
+       L190 19
+       L200 28
+       L190 37
+       L175 28"
     fill="none"
     stroke="url(#ice)"
     stroke-width="1.5"
@@ -57,11 +57,11 @@
   <!-- Direita -->
   <path
     d="M460 28
-       H355
-       L340 19
-       L330 28
-       L340 37
-       L355 28"
+       H325
+       L310 19
+       L300 28
+       L310 37
+       L325 28"
     fill="none"
     stroke="url(#ice)"
     stroke-width="1.5"
